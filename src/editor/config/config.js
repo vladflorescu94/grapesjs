@@ -29,6 +29,10 @@ define(function () {
     // Return JS of components inside HTML from 'editor.getHtml()'
     jsInHtml: true,
 
+    // On creation of a new Component (via object), if the 'style' attribute is not
+    // empty, all those roles will be moved in its new class
+    forceClass: true,
+
     // Height for the editor container
     height: '900px',
 
@@ -36,7 +40,7 @@ define(function () {
     width: '100%',
 
     // CSS that could only be seen (for instance, inside the code viewer)
-    protectedCss: '*{box-sizing: border-box;}body{margin:0;height:auto;background-color:#fff}#wrapper{min-height:100%; overflow:auto}',
+    protectedCss: '',
 
     // CSS for the iframe which containing the canvas, useful if you need to custom something inside
     // (eg. the style of the selected component)
