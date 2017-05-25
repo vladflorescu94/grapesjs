@@ -109,6 +109,8 @@ $colorpSize: 22px;
 }
 
 .#{$app-prefix}field-colorp-c {
+  @extend .#{$app-prefix}checker-bg;
+
   height: 100%;
   position: relative;
   width: 100%;
@@ -224,6 +226,10 @@ $colorpSize: 22px;
 
 .#{$app-prefix}field-select {
   padding: 0;
+
+  option {
+    @extend .#{$app-prefix}bg-main;
+  }
 }
 
 .#{$app-prefix}field-range {
