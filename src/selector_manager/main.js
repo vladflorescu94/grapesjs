@@ -88,10 +88,7 @@ define(function(require) {
         if(ppfx)
           c.stylePrefix = ppfx + c.stylePrefix;
 
-        selectors = new Selectors(c.selectors, {
-          em: c.em,
-          config: c,
-        });
+        selectors = new Selectors(c.selectors);
         selectorTags = new ClassTagsView({
           collection: selectors,
           config: c,

@@ -57,13 +57,15 @@ define(function(require) {
           // It's a CSSMediaRule
           if(node.cssRules) {
             var subRules = this.parseNode(node);
-            var mediaText = node.media.mediaText;
-
-            for( var s = 0, lens = subRules.length; s < lens; s++) {
-              var subRule = subRules[s];
-              subRule.mediaText = mediaText ? mediaText.trim() : '';
+            var widthA = node.media.mediaText.match(/-width:(.*)\)/i);
+            if(!widthA) {
+              continue;
             }
-
+            var width = widthA[1];
+            for(var s = 0, lens = subRules.length; s < lens; s++){
+              var subRule = subRules[s];
+              subRule.maxWidth = width ? width.trim() : '';
+            }
             result = result.concat(subRules);
           }
 
@@ -78,10 +80,7 @@ define(function(require) {
           var stl = node.style;
           var style = {};
           for (var j = 0, len2 = stl.length; j < len2; j++) {
-            var propName = stl[j];
-            var important = stl.getPropertyPriority(propName);
-            style[propName] = stl[propName] +
-              (important ? ' !' + important : '');
+            style[stl[j]] = stl[stl[j]];
           }
 
           var lastRule = '';

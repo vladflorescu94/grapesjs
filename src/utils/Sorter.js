@@ -38,7 +38,6 @@ define(function(require) {
         this.dropContent = null;
         this.em = o.em || '';
         this.dragHelper = null;
-        this.canvasRelative = o.canvasRelative || 0;
 
         if(this.em && this.em.on){
           this.em.on('change:canvasOffset', this.udpateOffset);
@@ -270,34 +269,21 @@ define(function(require) {
         var eO = this.offset(this.el);
         this.elT = this.wmargin ? Math.abs(eO.top) : eO.top;
         this.elL = this.wmargin ? Math.abs(eO.left): eO.left;
-        var rY = (e.pageY - this.elT) + this.el.scrollTop;
-        var rX = (e.pageX - this.elL) + this.el.scrollLeft;
-
-        if (this.canvasRelative && this.em) {
-          var mousePos = this.em.get('Canvas').getMouseRelativeCanvas(e);
-          rX = mousePos.x;
-          rY = mousePos.y;
-        }
-
-        var dims = this.dimsFromTarget(e.target, rX, rY);
+        this.rY = (e.pageY - this.elT) + this.el.scrollTop;
+        this.rX = (e.pageX - this.elL) + this.el.scrollLeft;
+        var dims = this.dimsFromTarget(e.target, this.rX, this.rY);
         this.lastDims = dims;
-        var pos = this.findPosition(dims, rX, rY);
+        var pos = this.findPosition(dims, this.rX, this.rY);
         // If there is a significant changes with the pointer
         if( !this.lastPos ||
             (this.lastPos.index != pos.index || this.lastPos.method != pos.method)){
           this.movePlaceholder(this.plh, dims, pos, this.prevTargetDim);
           if(!this.$plh)
             this.$plh = $(this.plh);
-
-          // With canvasRelative the offset is calculated automatically for
-          // each element
-          if (!this.canvasRelative) {
-            if(this.offTop)
-              this.$plh.css('top', '+=' + this.offTop + 'px');
-            if(this.offLeft)
-              this.$plh.css('left', '+=' + this.offLeft + 'px');
-          }
-
+          if(this.offTop)
+            this.$plh.css('top', '+=' + this.offTop + 'px');
+          if(this.offLeft)
+            this.$plh.css('left', '+=' + this.offLeft + 'px');
           this.lastPos = pos;
         }
 
@@ -425,26 +411,11 @@ define(function(require) {
        * @param {HTMLElement} el
        * @return {Array<number>}
        */
-      getDim: function(el) {
-        var top, left, height, width;
-
-        if (this.canvasRelative && this.em) {
-          var pos = this.em.get('Canvas').getElementPos(el);
-          top = pos.top;
-          left = pos.left;
-          height = pos.height;
-          width = pos.width;
-        } else {
-          var o = this.offset(el);
-          top = this.relative ? el.offsetTop : o.top - (this.wmargin ? -1 : 1) * this.elT;
-          left = this.relative ? el.offsetLeft : o.left - (this.wmargin ? -1 : 1) * this.elL;
-          height = el.offsetHeight;
-          width = el.offsetWidth;
-        }
-
-        //console.log('get dim', top, left, this.canvasRelative);
-
-        return [top, left, height, width];
+      getDim: function(el){
+        var o = this.offset(el);
+        var top = this.relative ? el.offsetTop : o.top - (this.wmargin ? -1 : 1) * this.elT;
+        var left = this.relative ? el.offsetLeft : o.left - (this.wmargin ? -1 : 1) * this.elL;
+        return [top, left, el.offsetHeight, el.offsetWidth];
       },
 
       /**
@@ -456,14 +427,6 @@ define(function(require) {
         var dims = [];
         if(!elem)
           return dims;
-
-        // Get children based on getChildrenContainer
-        var $elem = $(elem);
-        var elemData = $elem.data('model');
-        if (elemData && elemData.view) {
-          elem = elemData.view.getChildrenContainer();
-        }
-
         var ch = elem.children; //TODO filter match
         for (var i = 0, len = ch.length; i < len; i++) {
           var el = ch[i];
@@ -650,27 +613,12 @@ define(function(require) {
        * @param {Object} pos Object with position coordinates
        * */
       move: function(dst, src, pos) {
-        var em = this.em;
-        if (em) em.trigger('component:dragEnd:before', dst, src, pos);
-        var warns = [];
-        var modelToDrop, modelTemp, created;
         var index = pos.index;
         var model = $(src).data('model');
         var $dst = $(dst);
-        var targetModel;
-
-        while ($dst.length && !targetModel) {
-          targetModel = $dst.data('model');
-          dst = $dst.get(0);
-
-          if (targetModel && targetModel.view)
-            dst = targetModel.view.el;
-
-          if (!targetModel)
-            $dst = $dst.parent();
-        }
-
         var targetCollection = $dst.data('collection');
+        var targetModel = $dst.data('model');
+
         // Check if the elemenet is DRAGGABLE to the target
         var drag = model && model.get('draggable');
         var draggable = typeof drag !== 'undefined' ? drag : 1;
@@ -697,7 +645,7 @@ define(function(require) {
 
         // Check if the target could accept the element to be DROPPED inside
         var accepted = 1;
-        var droppable = targetModel && targetModel.get ? targetModel.get('droppable') : 1;
+        var droppable = targetModel ? targetModel.get('droppable') : 1;
         var toDrop = draggable;
         if(droppable instanceof Array) {
           // When I drag blocks src is the HTMLElement of the block
@@ -710,6 +658,7 @@ define(function(require) {
 
         if(targetCollection && droppable && accepted && draggable) {
           index = pos.method === 'after' ? index + 1 : index;
+          var modelToDrop, modelTemp;
           var opts = {at: index, noIncrement: 1};
           if(!this.dropContent){
             modelTemp = targetCollection.add({}, opts);
@@ -720,7 +669,7 @@ define(function(require) {
             modelToDrop = this.dropContent;
             opts.silent = false;
           }
-          created = targetCollection.add(modelToDrop, opts);
+          var created = targetCollection.add(modelToDrop, opts);
           if(!this.dropContent){
             targetCollection.remove(modelTemp);
           }else{
@@ -728,7 +677,9 @@ define(function(require) {
           }
           // This will cause to recalculate children dimensions
           this.prevTarget = null;
+          return created;
         } else {
+          var warns = [];
           if(!targetCollection){
             warns.push('target collection not found');
           }
@@ -743,11 +694,6 @@ define(function(require) {
           }
           console.warn('Invalid target position: ' + warns.join(', '));
         }
-
-        if (em)
-          em.trigger('component:dragEnd', targetCollection, modelToDrop, warns);
-
-        return created;
       },
 
       /**

@@ -29,10 +29,6 @@ define(['backbone'], function (Backbone) {
       this.model.set('value', this.getInputEl().value);
     },
 
-    getValueForTarget: function () {
-      return this.model.get('value');
-    },
-
     /**
      * On change callback
      * @private
@@ -41,7 +37,7 @@ define(['backbone'], function (Backbone) {
       var m = this.model;
       var trg = this.target;
       var name = m.get('name');
-      var value = this.getValueForTarget();
+      var value = m.get('value');
       // Chabge property if requested otherwise attributes
       if(m.get('changeProp')){
         trg.set(name, value);

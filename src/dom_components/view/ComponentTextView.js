@@ -48,10 +48,9 @@ define(['backbone', './ComponentView'],
         try {
           this.rte.detach(this, this.activeRte);
         } catch (err) {
-          console.error(err);
+            console.error(err);
         }
-        var el = this.getChildrenContainer();
-        model.set('content', el.innerHTML);
+        model.set('content', this.el.innerHTML);
       }
 
       if(!this.rte.customRte && editable) {
@@ -74,14 +73,13 @@ define(['backbone', './ComponentView'],
      * Parse content and re-render it
      * @private
      */
-    parseRender: function() {
-      var el = this.getChildrenContainer();
+    parseRender: function(){
       var comps = this.model.get('components');
       var opts = {silent: true};
 
       // Avoid re-render on reset with silent option
       comps.reset(null, opts);
-      comps.add(el.innerHTML, opts);
+      comps.add(this.$el.html(), opts);
       this.model.set('content', '');
       this.render();
 

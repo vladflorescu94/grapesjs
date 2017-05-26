@@ -28,9 +28,6 @@ define(['backbone','./Components', 'SelectorManager/model/Selectors', 'TraitMana
         // Tip:  Indicate an array of CSS properties which is possible to style
         stylable: true,
 
-        // Highlightable with 'dotted' style if true
-        highlightable: true,
-
         // True if it's possible to clone the component
         copyable: true,
 
@@ -110,20 +107,6 @@ define(['backbone','./Components', 'SelectorManager/model/Selectors', 'TraitMana
         traits.add(this.get('traits'));
         this.set('traits', traits);
         this.initToolbar();
-
-        // Normalize few properties from strings to arrays
-        var toNormalize = ['stylable'];
-        toNormalize.forEach(function(name) {
-          var value = this.get(name);
-
-          if (typeof value == 'string') {
-            var newValue = value.split(',').map(function(prop) {
-              return prop.trim();
-            });
-            this.set(name, newValue);
-          }
-        }, this);
-
         this.init();
       },
 

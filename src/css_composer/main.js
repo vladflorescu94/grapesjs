@@ -165,12 +165,12 @@ define(function(require) {
           var s = state || '';
           var w = width || '';
           var opt = opts || {};
-          var rule = this.get(selectors, s, w, opt);
+          var rule = this.get(selectors, s, w);
           if(rule)
             return rule;
           else {
             opt.state = s;
-            opt.mediaText = w;
+            opt.maxWidth = w;
             opt.selectors = '';
             rule = new CssRule(opt);
             rule.get('selectors').add(selectors);
@@ -184,7 +184,6 @@ define(function(require) {
          * @param {Array<Selector>} selectors Array of selectors
          * @param {String} state Css rule state
          * @param {String} width For which device this style is oriented
-         * @param {Object} ruleProps Other rule props
          * @return  {Model|null}
          * @example
          * var sm = editor.SelectorManager;
@@ -197,12 +196,12 @@ define(function(require) {
          *   color: '#000',
          * });
          * */
-        get: function(selectors, state, width, ruleProps) {
+        get: function(selectors, state, width) {
           var rule = null;
-          rules.each(function(m) {
+          rules.each(function(m){
             if(rule)
               return;
-            if(m.compare(selectors, state, width, ruleProps))
+            if(m.compare(selectors, state, width))
               rule = m;
           });
           return rule;
@@ -245,7 +244,7 @@ define(function(require) {
               newSels.push(selec);
             }
 
-            var model = this.add(newSels, rule.state, rule.mediaText, rule);
+            var model = this.add(newSels, rule.state, rule.maxWidth, rule);
             if (opt.extend) {
               var newStyle = _.extend({}, model.get('style'), rule.style || {});
               model.set('style', newStyle);

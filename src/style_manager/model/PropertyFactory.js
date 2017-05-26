@@ -254,9 +254,6 @@ define(['backbone'],
               case 'transform-scale-z':
                 obj.functionName = 'scaleZ';
                 break;
-              case 'background-image':
-                obj.functionName = 'url';
-                break;
             }
 
             // Options

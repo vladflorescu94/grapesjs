@@ -64,9 +64,8 @@ define([ 'backbone', 'require'],
 
       onAdd: function(model, c, opts){
         var style = model.get('style');
-        var em = this.editor;
 
-        if(!_.isEmpty(style) && em && em.get('Config').forceClass){
+        if(!_.isEmpty(style) && this.editor){
           var cssC = this.editor.get('CssComposer');
           var newClass = this.editor.get('SelectorManager').add(model.cid);
           model.set({style:{}});
