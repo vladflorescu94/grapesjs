@@ -128,7 +128,7 @@ define(function(require) {
               // From: <div> <span>TEST</span> </div> <-- span is text type
               // TO: <div> TEST </div> <-- div become text type
               if(parsed.length == 1 && parsed[0].type == 'text' &&
-                parsed[0].tagName == TEXT_NODE){
+                parsed[0].tagName == TEXT_NODE && parsed[0].content){
                 model.type = 'text';
                 model.content = parsed[0].content;
               }else
