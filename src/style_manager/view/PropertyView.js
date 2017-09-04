@@ -87,7 +87,9 @@ define(['backbone', 'text!./../templates/propertyLabel.html', 'text!./../templat
 			if(!target)
 				return;
 
-			var targetProp = target.get('style')[this.property];
+			var targetProp = target.get('style')[this.property]
+										|| window.getComputedStyle(target.view.el).getPropertyValue(this.property);
+
 			if(targetProp)
 				this.componentValue = targetProp;
 			else
