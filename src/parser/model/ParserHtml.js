@@ -5,6 +5,11 @@ define(function(require) {
     var TEXT_NODE = 'span';
     var c = config;
     var modelAttrStart = 'data-gjs-';
+    var inlineTags = [
+      'a', 'abbr', 'acronym', 'b', 'bdo', 'big', 'br', 'cite', 'code', 'del', 'dfn',
+      'em', 'i', 'img', 'ins', 'kbd', 'label', 'map', 'object', 'q', 's', 'samp',
+      'small', 'span', 'strong', 'sub', 'sup', 'time', 'tt', 'u', 'var'
+    ];
 
     return {
 
@@ -126,22 +131,23 @@ define(function(require) {
           if(nodeChild && !model.components){
             // Avoid infinite text nodes nesting
             var firstChild = node.childNodes[0];
-            if(nodeChild === 1 && firstChild.nodeType === 3){
-              if(!model.type){
+
+            if (nodeChild === 1 && firstChild.nodeType === 3) {
+              if (!model.type) {
                 model.type = 'text';
               }
               model.content = firstChild.nodeValue;
-            }else{
+            } else {
               var parsed = this.parseNode(node);
               // From: <div> <span>TEST</span> </div> <-- span is text type
               // TO: <div> TEST </div> <-- div become text type
 
-              if(parsed.length == 1 && parsed[0].type == 'text' &&
+              if (parsed.length == 1 && parsed[0].type == 'text' &&
                 parsed[0].tagName == TEXT_NODE && parsed[0].content &&
-                node.childNodes[0].style.cssText === "" ) {
+                firstChild.style.cssText === "" && firstChild.classList.length === 0) {
                 model.type = 'text';
                 model.content = parsed[0].content;
-              }else
+              } else
                 model.components = parsed;
             }
           }
@@ -165,7 +171,8 @@ define(function(require) {
           var comps = model.components;
           if(!model.type && comps){
             var allTxt = 1;
-            var foundTextNode = 0;
+            var foundTextNodeOrInlineElement = 0;
+
             for(var ci = 0; ci < comps.length; ci++){
               var comp = comps[ci];
               if(comp.type != 'text' &&
@@ -174,10 +181,12 @@ define(function(require) {
                 allTxt = 0;
                 break;
               }
-              if(comp.type == 'textnode')
-                foundTextNode = 1;
+
+              if(comp.type == 'textnode' || inlineTags.indexOf(comp.tagName) !== -1)
+                foundTextNodeOrInlineElement = 1;
             }
-            if(allTxt && foundTextNode)
+
+            if(allTxt && foundTextNodeOrInlineElement)
               model.type = 'text';
           }
 
