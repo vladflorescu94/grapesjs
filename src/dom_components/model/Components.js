@@ -65,13 +65,13 @@ define([ 'backbone', 'require'],
       onAdd: function(model, c, opts){
         var style = model.get('style');
 
-        if(!_.isEmpty(style) && this.editor){
+        if(!_.isEmpty(style) && this.editor) {
           var cssC = this.editor.get('CssComposer');
           var newClass = this.editor.get('SelectorManager').add(model.cid);
           model.set({style:{}});
           model.get('classes').add(newClass);
           var rule = cssC.add(newClass);
-          rule.set('style', style);
+          rule.set('style', _.extend({}, rule.get('style'), style));
         }
       },
 
