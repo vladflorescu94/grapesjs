@@ -1,15 +1,9 @@
-var modulePath = './../../../test/specs/utils';
+define((require, exports, module) => {
+  'use strict';
+  var Utils = require('Utils');
+  var Sorter = require('undefined');
 
-define([
-        'Utils',
-        modulePath + '/Sorter'
-         ],
-  function(
-          Utils,
-          Sorter
-          ) {
-
-    describe('Utils', function() {
+    describe('Utils', () => {
 
       Sorter.run();
 

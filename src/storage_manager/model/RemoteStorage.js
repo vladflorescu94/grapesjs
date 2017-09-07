@@ -1,66 +1,78 @@
-define(['backbone'],
-	function (Backbone) {
-		/**
-		 * @class RemoteStorage
-		 * */
-		return Backbone.Model.extend({
+var Backbone = require('backbone');
 
-			defaults: {
-				urlStore: '',
-				urlLoad: '',
-				params: {},
-				beforeSend: function(){},
-				onComplete: function(){},
-			},
+module.exports = Backbone.Model.extend({
 
-			/**
-			 * @private
-			 */
-			store: function(data) {
-				var fd = {},
-				params = this.get('params');
+  defaults: {
+    urlStore: '',
+    urlLoad: '',
+    params: {},
+    beforeSend() {},
+    onComplete() {},
+    contentTypeJson: false
+  },
 
-				for(var k in data)
-					fd[k] = data[k];
+  /**
+   * @private
+   */
+  store(data, clb) {
+    var fd = {},
+    params = this.get('params');
 
-				for(var key in params)
-					fd[key] = params[key];
+    for(var k in data)
+      fd[k] = data[k];
 
-				$.ajax({
-					url: this.get('urlStore'),
-					beforeSend: this.get('beforeSend'),
-					complete: this.get('onComplete'),
-					method: 'POST',
-					dataType: 'json',
-					data: fd,
-				});
-			},
+    for(var key in params)
+      fd[key] = params[key];
 
-			/**
-			 * @private
-			 */
-			load: function(keys){
-				var result = {},
-				fd = {},
-				params = this.get('params');
+    let req = $.ajax({
+      url: this.get('urlStore'),
+      beforeSend: this.get('beforeSend'),
+      complete: this.get('onComplete'),
+      method: 'POST',
+      dataType: 'json',
+      contentType: this.get('contentTypeJson') ? 'application/json; charset=utf-8': 'x-www-form-urlencoded',
+      data: this.get('contentTypeJson') ? JSON.stringify(fd): fd,
+    });
 
-				for(var key in params)
-					fd[key] = params[key];
+    // Assign always callback when possible
+    req && req.always && req.always(() => {
+      if (typeof clb == 'function') {
+        clb();
+      }
+    });
+  },
 
-				fd.keys = keys;
+  /**
+   * @private
+   */
+  load(keys, clb) {
+    var result = {},
+    fd = {},
+    params = this.get('params');
 
-				$.ajax({
-					url: this.get('urlLoad'),
-					beforeSend: this.get('beforeSend'),
-					complete: this.get('onComplete'),
-					data: fd,
-					async: false,
-					method: 'GET',
-				}).done(function(d){
-					result = d;
-				});
-				return result;
-			},
+    for(var key in params)
+      fd[key] = params[key];
 
-		});
+    fd.keys = keys;
+
+    let req = $.ajax({
+      url: this.get('urlLoad'),
+      beforeSend: this.get('beforeSend'),
+      complete: this.get('onComplete'),
+      data: fd,
+      async: false,
+      method: 'GET',
+    }).done(d => {
+      result = d;
+    });
+
+    // Assign always callback when possible
+    req && req.always && req.always((res) => {
+      if (typeof clb == 'function') {
+        clb(res);
+      }
+    });
+    return result;
+  },
+
 });

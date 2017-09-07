@@ -1,55 +1,52 @@
-var path = 'Panels/view/';
-define([path + 'PanelsView', 'Panels/model/Panels'],
-  function(PanelsView, Panels) {
+const PanelsView = require('panels/view/PanelsView');
+const Panels = require('panels/model/Panels');
 
-    return {
-      run : function(){
-          describe('PanelsView', function() {
+module.exports = {
+  run() {
+      describe('PanelsView', () => {
 
-            var $fixtures;
-            var $fixture;
-            var model;
-            var view;
+        var $fixtures;
+        var $fixture;
+        var model;
+        var view;
 
-            before(function () {
-              $fixtures  = $("#fixtures");
-              $fixture   = $('<div class="cssrules-fixture"></div>');
-            });
-
-            beforeEach(function () {
-              model = new Panels([]);
-              view = new PanelsView({
-                collection: model
-              });
-              $fixture.empty().appendTo($fixtures);
-              $fixture.html(view.render().el);
-            });
-
-            afterEach(function () {
-              view.collection.reset();
-            });
-
-            after(function () {
-              $fixture.remove();
-            });
-
-            it("Collection is empty", function (){
-              view.$el.html().should.be.empty;
-            });
-
-            it("Add new panel", function (){
-              sinon.stub(view, "addToCollection");
-              view.collection.add({});
-              view.addToCollection.calledOnce.should.equal(true);
-            });
-
-            it("Render new panel", function (){
-              view.collection.add({});
-              view.$el.html().should.not.be.empty;
-            });
-
+        before(() => {
+          $fixtures  = $("#fixtures");
+          $fixture   = $('<div class="cssrules-fixture"></div>');
         });
-      }
-    };
 
-});
+        beforeEach(() => {
+          model = new Panels([]);
+          view = new PanelsView({
+            collection: model
+          });
+          $fixture.empty().appendTo($fixtures);
+          $fixture.html(view.render().el);
+        });
+
+        afterEach(() => {
+          view.collection.reset();
+        });
+
+        after(() => {
+          $fixture.remove();
+        });
+
+        it("Collection is empty", () => {
+          expect(view.$el.html()).toEqual('');
+        });
+
+        it("Add new panel", () => {
+          sinon.stub(view, "addToCollection");
+          view.collection.add({});
+          expect(view.addToCollection.calledOnce).toEqual(true);
+        });
+
+        it("Render new panel", () => {
+          view.collection.add({});
+          expect(view.$el.html()).toExist();
+        });
+
+    });
+  }
+};

@@ -1,44 +1,41 @@
-var path = 'Commands/model/';
-define([path + 'Command', path + 'Commands'],
-  function(Command, Commands) {
+const Command = require('commands/model/Command');
+const Commands = require('commands');
 
-    return {
-      run : function(){
-        describe('Command', function() {
-          var obj;
+module.exports = {
+  run() {
+    describe('Command', () => {
+      let obj;
 
-          beforeEach(function () {
-            obj = new Command();
-          });
+      beforeEach(() => {
+        obj = new Command();
+      });
 
-          afterEach(function () {
-            delete obj;
-          });
+      afterEach(() => {
+        obj = null;
+      });
 
-          it('Has id property', function() {
-            obj.has('id').should.equal(true);
-          });
+      it('Has id property', () => {
+        expect(obj.has('id')).toEqual(true);
+      });
 
-        });
+    });
 
-        describe('Commands', function() {
-          var obj;
+    describe('Commands', () => {
+      var obj;
 
-          beforeEach(function () {
-            obj = new Commands();
-          });
+      beforeEach(() => {
+        obj = new Commands();
+      });
 
-          afterEach(function () {
-            delete obj;
-          });
+      afterEach(() => {
+        obj = null;
+      });
 
-          it('Object is ok', function() {
-            obj.should.be.ok;
-          });
+      it('Object is ok', () => {
+        expect(obj).toExist();
+      });
 
-        });
+    });
 
-      }
-    };
-
-});
+  }
+};

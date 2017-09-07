@@ -1,7 +1,7 @@
-define(function () {
-	return {
+module.exports = {
 
-    'blocks': [],
+  blocks: [],
 
-	};
-});
+  appendTo: '',
+
+};
