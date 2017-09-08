@@ -98,6 +98,7 @@ define(['backbone','./Components', 'SelectorManager/model/Selectors', 'TraitMana
         this.defaultCl = this.normalizeClasses(this.get('classes') || this.config.classes || []);
         this.components	= new Components(this.defaultC, opt);
         this.components.parent = this;
+        this.listenTo(this, 'change:style', this.makeStyleImportant);
         this.listenTo(this, 'change:script', this.scriptUpdated);
         this.set('attributes', this.get('attributes') || {});
         this.set('components', this.components);
@@ -334,7 +335,19 @@ define(['backbone','./Components', 'SelectorManager/model/Selectors', 'TraitMana
         }
 
         return scr;
-      }
+      },
+
+      makeStyleImportant: function() {
+        var style = this.get('style');
+
+        var styleUpdated = _.mapObject(this.get('style'), function(prop) {
+          return prop.match(/!important$/) ? prop : (prop + ' !important');
+        });
+
+        if (!_.isEqual(style, styleUpdated)) {
+          this.set('style', styleUpdated);
+        }
+      });
 
     },{
 
