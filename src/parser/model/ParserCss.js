@@ -81,6 +81,9 @@ define(function(require) {
           var style = {};
           for (var j = 0, len2 = stl.length; j < len2; j++) {
             style[stl[j]] = stl[stl[j]];
+            if (stl.getPropertyPriority(stl[j]) === 'important') {
+              style[stl[j]] += ' !important';
+            }
           }
 
           var lastRule = '';
