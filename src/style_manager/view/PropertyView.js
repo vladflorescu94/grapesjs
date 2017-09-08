@@ -87,9 +87,11 @@ define(['backbone', 'text!./../templates/propertyLabel.html', 'text!./../templat
 			if(!target)
 				return;
 
-			var targetProp = target.get('style')[this.property] || (
+			var stripRulePriority = function(str) { return str && str.replace(/ !important$/, '') };
+
+			var targetProp = stripRulePriority(target.get('style')[this.property] || (
 				target.view && window.getComputedStyle(target.view.el).getPropertyValue(this.property)
-      );
+      ));
 
 			if(targetProp)
 				this.componentValue = targetProp;
