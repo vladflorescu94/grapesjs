@@ -251,9 +251,12 @@ define(['backbone', './ComponentsView'],
                 var unit = 'px';
                 var style = _.clone(modelToStyle.get('style'));
                 var width = rect.w + (store ? 1 : 0);
-                style.width = width + unit;
-                style.height = rect.h + unit;
-                modelToStyle.set('style', style, {avoidStore: 1});
+                var widthPriority = (style.width || '').match(/ !important$/)?' !important' : '';
+                var heightPriority = (style.height || '').match(/ !important$/)?' !important' : '';
+
+                style.width = width + unit + widthPriority;
+                style.height = rect.h + unit + heightPriority;
+                modelToStyle.set('style', style, { avoidStore: 1 });
                 em.trigger('targetStyleUpdated');
 
                 // This trick will trigger the Undo Manager. To trigger "change:style"
@@ -262,7 +265,7 @@ define(['backbone', './ComponentsView'],
                 // above I've added + 1 to width if store required)
                 if(store) {
                   var style3 = _.clone(style);
-                  style3.width = (width - 1) + unit;
+                  style3.width = (width - 1) + unit + widthPriority;
                   modelToStyle.set('style', style3);
                 }
               }
